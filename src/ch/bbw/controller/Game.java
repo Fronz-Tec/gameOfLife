@@ -1,8 +1,16 @@
 package ch.bbw.controller;
 
 import ch.bbw.model.Cell;
+import ch.bbw.view.ConsoleView;
+import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+
+import java.util.Random;
 
 public class Game {
+
+    private ConsoleView consoleView;
 
     private int width = 20;
     private int height = 20;
@@ -13,6 +21,24 @@ public class Game {
         this.grid = grid;
         this.width = grid.length;
         this.height = grid.length;
+        this.consoleView = new ConsoleView();
+    }
+
+    public void showGrid(GridPane gridPane){
+        //Clear Console doesn't work properly, using JavaFX instead
+//        consoleView.displayCells(grid);
+
+        for (int x = 0; x < grid.length; x++) {
+            for(int y = 0; y < grid[x].length; y++){
+                if(grid[x][y].isAlive()){
+                    ((Rectangle)(gridPane.getChildren().get(x * grid.length + y))).setFill(Color.RED);
+                }else{
+                    ((Rectangle)(gridPane.getChildren().get(x * grid.length + y))).setFill(Color.WHITE);
+                }
+
+            }
+        }
+
     }
 
     public int countNeighbors(int row, int collumn){
@@ -70,8 +96,8 @@ public class Game {
 
     public void calculateGeneration(){
 
-        for (int x = 0; x <= grid.length; x++) {
-            for (int y = 0; y <= grid[x].length; y++) {
+        for (int x = 0; x < grid.length; x++) {
+            for (int y = 0; y < grid[x].length; y++) {
 
                 int neighbors = countNeighbors(x,y);
 
@@ -99,8 +125,8 @@ public class Game {
 
     public void updateCells(){
 
-        for (int x = 0; x <= grid.length; x++) {
-            for(int y = 0; y <= grid[x].length; y++){
+        for (int x = 0; x < grid.length; x++) {
+            for(int y = 0; y < grid[x].length; y++){
                 getCell(x,y).updateState();
             }
         }
