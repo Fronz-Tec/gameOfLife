@@ -1,6 +1,8 @@
 package ch.bbw;
 
 import ch.bbw.controller.Game;
+import ch.bbw.lib.file.Export;
+import ch.bbw.lib.file.Import;
 import ch.bbw.model.Cell;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -43,6 +45,8 @@ public class Main extends Application {
         game.calculateGeneration();
         game.showGrid(gridPane);
 
+        Export.exportIsAliveState(cell);
+        cell = Import.importIsAliveStates("");
 
         Scene scene = new Scene(gridPane);
         primaryStage.setScene(scene);
