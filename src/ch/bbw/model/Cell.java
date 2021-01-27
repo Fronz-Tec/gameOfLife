@@ -17,15 +17,19 @@ public class Cell {
     }
 
     public void updateState(){
+        this.oldState = this.isAlive;
         this.isAlive = this.newState;
+
+        if(isAlive){
+            age++;
+        }else{
+            age = 0;
+        }
+
     }
 
     public boolean isAlive() {
         return isAlive;
-    }
-
-    public void setAlive(boolean alive) {
-        isAlive = alive;
     }
 
     public boolean isNewState() {
@@ -40,15 +44,8 @@ public class Cell {
         return oldState;
     }
 
-    public void setOldState(boolean oldState) {
-        this.oldState = oldState;
-    }
 
     public int getAge() {
         return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
     }
 }
