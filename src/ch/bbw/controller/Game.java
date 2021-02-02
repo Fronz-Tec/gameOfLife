@@ -6,14 +6,14 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+
+import java.util.Random;
 
 
 public class Game {
@@ -38,29 +38,26 @@ public class Game {
         this.width = grid.length;
         this.height = grid.length;
 
-        runnerThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (!Thread.currentThread().isInterrupted()) {
-                    if (!pauseRunningThread) {
-                        try {
-                            Game.this.calculateGeneration();
-                            if (!Game.this.cellsChaning()) {
-                                Platform.runLater(() -> {
-                                    Stage dialog = new Stage();
-                                    dialog.initStyle(StageStyle.UTILITY);
-                                    Scene scene = new Scene(new Group(new Text(25, 25, "No more generations!")));
-                                    dialog.setScene(scene);
-                                    dialog.showAndWait();
-                                });
-                                pauseRunningThread = true;
-                            }
-                            Game.this.updateCells();
-                            Game.this.showGrid();
-                            Thread.sleep(speed);
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
+        runnerThread = new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                if (!pauseRunningThread) {
+                    try {
+                        Game.this.calculateGeneration();
+                        if (!Game.this.cellsChanging()) {
+                            Platform.runLater(() -> {
+                                Stage dialog = new Stage();
+                                dialog.initStyle(StageStyle.UTILITY);
+                                Scene scene = new Scene(new Group(new Text(25, 25, "No more generations!")));
+                                dialog.setScene(scene);
+                                dialog.showAndWait();
+                            });
+                            pauseRunningThread = true;
                         }
+                        Game.this.updateCells();
+                        Game.this.showGrid();
+                        Thread.sleep(speed);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
                     }
                 }
             }
@@ -68,13 +65,10 @@ public class Game {
         runnerThread.start();
     }
 
-    private boolean cellsChaning() {
+    private boolean cellsChanging() {
         boolean cellsChanged = false;
         for (int x = 0; x < grid.length; x++) {
             for (int y = 0; y < grid[x].length; y++) {
-//                if (grid[x][y].isAlive() != grid[x][y].isNewState()) {
-//                    cellsChanged = true;
-//                }
                 if (grid[x][y].isOldState() != grid[x][y].isNewState()) {
                     cellsChanged = true;
                 }
@@ -84,9 +78,6 @@ public class Game {
     }
 
     public void showGrid(){
-        //Clear Console doesn't work properly, using JavaFX instead
-//        consoleView.displayCells(grid);
-
         for (int x = 0; x < grid.length; x++) {
             for(int y = 0; y < grid[x].length; y++){
                 if(grid[x][y].isAlive()){
@@ -102,10 +93,8 @@ public class Game {
                     ((Rectangle)(gridPane.getChildren().get(x * grid.length + y))).setFill(Color.WHITE);
                     ((gridPane.getChildren().get(x * grid.length + y))).setOpacity(1);
                 }
-
             }
         }
-
     }
 
     public int countNeighbors(int row, int collumn){
@@ -183,8 +172,6 @@ public class Game {
                 }
             }
         }
-
-
     }
 
     public void updateCells(){
@@ -197,14 +184,6 @@ public class Game {
 
     }
 
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
     public Cell[][] getGrid() {
         return grid;
     }
@@ -215,33 +194,40 @@ public class Game {
     }
 
     public EventHandler<ActionEvent> start() {
-        return new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                pauseRunningThread = false;
-            }
-        };
+        return event -> pauseRunningThread = false;
     }
 
     public EventHandler<ActionEvent> stop() {
-        return new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                pauseRunningThread = true;
-            }
-        };
+        return event -> pauseRunningThread = true;
     }
 
     public EventHandler<ActionEvent> showCellAge() {
-        return new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                showCellAge = !showCellAge;
-            }
-        };
+        return event -> showCellAge = !showCellAge;
     }
 
     public void setGenerationSpeed(Number newValue) {
         speed = (int) (newValue.doubleValue()*1000);
     }
+
+    public EventHandler<ActionEvent> random() {
+        return event -> {
+            pauseRunningThread = true;
+            Random random = new Random();
+            for (int x = 0; x < getGrid().length; x++) {
+                for (int y = 0; y < getGrid()[x].length; y++) {
+                    getGrid()[x][y].setNewState(random.nextBoolean());
+                    getGrid()[x][y].resetAge();
+                    getGrid()[x][y].updateState();
+                }
+            }
+            showGrid();
+        };
+    }
+
+    public void importFile(Cell[][] importIsAliveStates) {
+        pauseRunningThread = true;
+        this.grid = importIsAliveStates;
+        showGrid();
+    }
 }
+

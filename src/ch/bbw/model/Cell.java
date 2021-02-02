@@ -48,4 +48,8 @@ public class Cell {
     public int getAge() {
         return age;
     }
+
+    public void resetAge(){
+        age=0;
+    }
 }

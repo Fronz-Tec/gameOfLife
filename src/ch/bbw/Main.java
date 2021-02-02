@@ -5,8 +5,6 @@ import ch.bbw.lib.file.Export;
 import ch.bbw.lib.file.Import;
 import ch.bbw.model.Cell;
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -16,9 +14,10 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.awt.*;
+import java.io.File;
 import java.util.Random;
 
 public class Main extends Application {
@@ -52,19 +51,6 @@ public class Main extends Application {
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(gridPane);
 
-        //TODO 2 more buttons import Export
-        //Export.exportIsAliveState(cell);
-        //cell = Import.importIsAliveStates("");
-
-        //TODO 1 Button Random
-        //Action
-//        for (int x = 0; x < cell.length; x++) {
-//            for (int y = 0; y < cell[x].length; y++) {
-//                cell[x][y].setNewState(new Random().nextBoolean());
-//                cell[x][y].updateState();
-//            }
-//        }
-
         FlowPane flowPane = new FlowPane();
         Button startButton = new Button("Start");
         startButton.setOnAction(game.start());
@@ -75,22 +61,42 @@ public class Main extends Application {
         Button cellAgeButton = new Button("Show Cell Age");
         cellAgeButton.setOnAction(game.showCellAge());
 
+        Button randomButton = new Button("Generate Random");
+        randomButton.setOnAction(game.random());
+
+        Button importButton = new Button("Import");
+        importButton.setOnAction(event -> {
+            FileChooser fileChooser = new FileChooser();
+            File file = fileChooser.showOpenDialog(primaryStage);
+            if(file != null){
+                game.importFile(Import.importIsAliveStates(file.getPath()));
+            }
+        });
+
+        Button exportButton = new Button("Export");
+        exportButton.setOnAction(event -> {
+            FileChooser fileChooser = new FileChooser();
+            File file = fileChooser.showSaveDialog(primaryStage);
+            if(file != null){
+                Export.exportIsAliveState(game.getGrid(), file.getAbsoluteFile());
+            }
+        });
+
+
         Slider slider = new Slider(0.1, 5, 1);
         slider.setShowTickLabels(true);
         slider.setShowTickMarks(true);
 
-        slider.valueProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                game.setGenerationSpeed(newValue);
-            }
-        });
+        slider.valueProperty().addListener((observable, oldValue, newValue) -> game.setGenerationSpeed(newValue));
 
         flowPane.setVgap(20);
         flowPane.setHgap(20);
         flowPane.getChildren().add(startButton);
         flowPane.getChildren().add(endButton);
         flowPane.getChildren().add(cellAgeButton);
+        flowPane.getChildren().add(randomButton);
+        flowPane.getChildren().add(importButton);
+        flowPane.getChildren().add(exportButton);
         flowPane.getChildren().add(new Label("Speed (0.1 - 1)"));
         flowPane.getChildren().add(slider);
 

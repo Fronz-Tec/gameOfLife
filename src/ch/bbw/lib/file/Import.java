@@ -2,18 +2,21 @@ package ch.bbw.lib.file;
 
 import ch.bbw.model.Cell;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 
 public class Import {
 
 
     public static Cell[][] importIsAliveStates(String path){
+
         Cell[][] cell = null;
         int length = 0;
         int x = 0;
 
         try {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream("C:/tmp/conway_export.txt")));
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
             String line;
             while ((line = bufferedReader.readLine())!= null){
                 length = line.length();

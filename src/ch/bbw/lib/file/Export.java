@@ -3,12 +3,13 @@ package ch.bbw.lib.file;
 import ch.bbw.model.Cell;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
 public class Export {
 
-    public static void exportIsAliveState(Cell[][] cell){
+    public static void exportIsAliveState(Cell[][] cell, File absoluteFile){
         StringBuilder stringBuilder = new StringBuilder();
 
         for (int x = 0; x < cell.length; x++) {
@@ -18,7 +19,7 @@ public class Export {
             stringBuilder.append("\n");
         }
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter("C:/tmp/conway_export.txt"));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(absoluteFile));
             writer.write(stringBuilder.toString());
             writer.close();
         } catch (IOException e) {
